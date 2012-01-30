@@ -66,7 +66,12 @@ object Run {
         resp =>
           printResp(resp)
           think.foreach {
-            t => Thread.sleep(Random.nextInt(t.toInt))
+            t =>
+              val sleep = t.toInt + Random.nextInt(t.toInt)
+              if (debug) println("Sleeping:" + sleep)
+              Thread.sleep(sleep.toLong)
+              if (debug) println("done")
+
           }
           requests(req, count + 1)
       }
