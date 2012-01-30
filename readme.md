@@ -30,6 +30,6 @@ The the tester process will run to completion, and exit which heroku interprets 
 Heroku will then restart the process, and it will again run to completion. At this point Heroku marks the process as crashed.
 Once all your runs finish, run this:
     
-    heroku scale web=0
+    heroku scale tester=0
     
 
