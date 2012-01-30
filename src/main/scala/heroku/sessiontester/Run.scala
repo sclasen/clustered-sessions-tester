@@ -1,6 +1,5 @@
 package heroku.sessiontester
 
-import util.Properties
 import com.twitter.util.Future
 import com.twitter.finagle.builder.ClientBuilder
 import java.net.{InetSocketAddress, URL}
@@ -10,6 +9,7 @@ import org.jboss.netty.handler.codec.http._
 import com.codahale.jerkson.Json._
 import java.lang.String
 import org.jboss.netty.util.CharsetUtil
+import util.{Random, Properties}
 
 
 case class Session(count: Int)
@@ -17,6 +17,8 @@ case class Session(count: Int)
 object Run {
 
   val debug = Properties.envOrElse("DEBUG", "false").toBoolean
+  val think = Properties.envOrNone("THINK").map(_.toLong)
+
 
   def main(args: Array[String]) {
     val concurrency = Properties.envOrElse("CONCURRENCY", "1").toInt
@@ -63,6 +65,9 @@ object Run {
       client(req).flatMap {
         resp =>
           printResp(resp)
+          think.foreach {
+            t => Thread.sleep(Random.nextInt(t.toInt))
+          }
           requests(req, count + 1)
       }
     } else {
