@@ -26,7 +26,7 @@ object DB {
     pool.foreach {
       p =>
         managed(p.getConnection).acquireAndGet {
-          c => managed(c.prepareStatement(""" INSERT INTO RESULTS VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
+          c => managed(c.prepareStatement(""" INSERT INTO RESULTS VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
             s =>
               import s._
               setString(1, appUrl)
