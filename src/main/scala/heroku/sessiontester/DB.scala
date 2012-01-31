@@ -26,7 +26,7 @@ object DB {
     pool.foreach {
       p =>
         managed(p.getConnection).acquireAndGet {
-          c => managed(c.prepareStatement(""" INSERT INTO RESULTS VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
+          c => managed(c.prepareStatement(""" INSERT INTO CLUSTERED_SESSION_RESULTS VALUES(?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
             s =>
               import s._
               setString(1, appUrl)
@@ -49,10 +49,10 @@ object DB {
     for (conn <- managed(p.getConnection);
          stmt <- managed(conn.createStatement())
     ) {
-      stmt.execute("DROP TABLE RESULTS")
+      stmt.execute("DROP TABLE IF EXISTS CLUSTERED_SESSION_RESULTS")
       println("DROP TABLE RESULTS")
       stmt.execute("""
-                    CREATE TABLE RESULTS
+                    CREATE TABLE CLUSTERED_SESSION_RESULTS
                     (
                     app varchar(1024),
                     stack varchar(1024),
@@ -66,10 +66,10 @@ object DB {
                     added timestamp
                     )
                     """)
-      println(" CREATE TABLE RESULTS")
+      println(" CREATE TABLE CLUSTERED_SESSION_RESULTS")
       addTestRun("test", "test", 1, 1, 1, 1, 1, 1, 1)
       println("test insert passed")
-      stmt.executeUpdate("delete from RESULTS")
+      stmt.executeUpdate("delete from CLUSTERED_SESSION_RESULTS")
       println("cleared table")
     }
   }
