@@ -18,6 +18,9 @@ object Run {
 
   val debug = Properties.envOrElse("DEBUG", "false").toBoolean
   val think = Properties.envOrNone("THINK").map(_.toLong)
+  val appStack = Properties.envOrElse("APP_STACK", "UNKNOWN")
+  val dynos = Properties.envOrElse("DYNOS", "0").toInt
+  val scale = Properties.envOrElse("SCALE", "0").toInt
 
 
   def main(args: Array[String]) {
@@ -31,6 +34,7 @@ object Run {
     Future.collect(futures).get().foreach {
       lastResp => {
         val session: Session = parse[Session](lastResp._1.getContent.array())
+        DB.addTestRun(appStack, dynos, numRequests, session.count, concurrency, scale)
         if (session.count == numRequests) {
           if (debug)
             println("Client #%d Session was consistent".format(lastResp._2))
