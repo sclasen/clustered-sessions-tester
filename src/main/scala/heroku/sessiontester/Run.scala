@@ -34,7 +34,7 @@ object Run {
     Future.collect(futures).get().foreach {
       lastResp => {
         val session: Session = parse[Session](lastResp._1.getContent.array())
-        DB.addTestRun(url, appStack, dynos, numRequests, session.count, concurrency, scale, think)
+        DB.addTestRun(url, appStack, dynos, numRequests, session.count, concurrency, scale, think.getOrElse(0L).toInt)
         if (session.count == numRequests) {
           if (debug)
             println("Client #%d Session was consistent".format(lastResp._2))
