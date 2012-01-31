@@ -65,6 +65,10 @@ object DB {
                     )
                     """)
       println(" CREATE TABLE RESULTS")
+      addTestRun("test", "test", 1, 1, 1, 1, 1, 1)
+      println("test insert passed")
+      stmt.executeUpdate("delete from RESULTS")
+      println("cleared table")
     }
   }
 
