@@ -43,6 +43,7 @@ object Run {
     println("Executed %d total requests".format(overall))
     println("Total time: %d ms".format(time))
     println("RPS: %d ".format((overall * 1000) / time))
+    think.foreach(t => println("Think Time at least:%d ms".format(t)))
   }
 
 
@@ -54,7 +55,8 @@ object Run {
     req.setHeader(HttpHeaders.Names.HOST, url.getHost)
     client(req).flatMap {
       resp =>
-        val cookie = resp.getHeader(HttpHeaders.Names.SET_COOKIE)
+        val cookieHeader = resp.getHeader(HttpHeaders.Names.SET_COOKIE)
+        val cookie = cookieHeader.substring(0, cookieHeader.indexOf(";"))
         req.setHeader(HttpHeaders.Names.COOKIE, cookie)
         requests(req)(client, numRequests - 1).map((_, id))
     }
