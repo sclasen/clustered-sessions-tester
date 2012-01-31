@@ -22,7 +22,7 @@ object DB {
       pool
   }
 
-  def addTestRun(appUrl: String, appStack: String, dynos: Int, requests: Int, counted: Int, concurrency: Int, scale: Int, think: Int) {
+  def addTestRun(appUrl: String, appStack: String, dynos: Int, requests: Int, counted: Int, concurrency: Int, scale: Int, think: Int, weight: Int) {
     pool.foreach {
       p =>
         managed(p.getConnection).acquireAndGet {
@@ -37,6 +37,7 @@ object DB {
               setInt(6, concurrency)
               setInt(7, scale)
               setInt(8, think)
+              setInt(9, weight)
               executeUpdate()
           }
         }
@@ -61,11 +62,12 @@ object DB {
                     concurrency bigint,
                     scale bigint,
                     think bigint,
+                    weight bigint,
                     added timestamp
                     )
                     """)
       println(" CREATE TABLE RESULTS")
-      addTestRun("test", "test", 1, 1, 1, 1, 1, 1)
+      addTestRun("test", "test", 1, 1, 1, 1, 1, 1, 1)
       println("test insert passed")
       stmt.executeUpdate("delete from RESULTS")
       println("cleared table")

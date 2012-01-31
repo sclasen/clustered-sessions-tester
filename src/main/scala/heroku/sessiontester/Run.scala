@@ -21,6 +21,7 @@ object Run {
   val appStack = Properties.envOrElse("APP_STACK", "UNKNOWN")
   val dynos = Properties.envOrElse("DYNOS", "0").toInt
   val scale = Properties.envOrElse("SCALE", "0").toInt
+  val weight = Properties.envOrNone("WEIGHT")
 
 
   def main(args: Array[String]) {
@@ -34,7 +35,7 @@ object Run {
     Future.collect(futures).get().foreach {
       lastResp => {
         val session: Session = parse[Session](lastResp._1.getContent.array())
-        DB.addTestRun(url, appStack, dynos, numRequests, session.count, concurrency, scale, think.getOrElse(0L).toInt)
+        DB.addTestRun(url, appStack, dynos, numRequests, session.count, concurrency, scale, think.getOrElse(0L).toInt, weight.foldLeft(0)((_, s) => s.toInt))
         if (session.count == numRequests) {
           if (debug)
             println("Client #%d Session was consistent".format(lastResp._2))
@@ -55,7 +56,7 @@ object Run {
     val url = new URL(app)
     val client: Service[HttpRequest, HttpResponse] = ClientBuilder().
       hosts(new InetSocketAddress(url.getHost, 80)).codec(Http.get()).name(id.toString).hostConnectionLimit(1).build()
-    val req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, url.getPath);
+    val req = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, weight.foldLeft(url.getPath)((p, w) => p + "?weight=" + w));
     req.setHeader(HttpHeaders.Names.HOST, url.getHost)
     client(req).flatMap {
       resp =>
@@ -63,6 +64,13 @@ object Run {
         val cookie = cookieHeader.substring(0, cookieHeader.indexOf(";"))
         req.setHeader(HttpHeaders.Names.COOKIE, cookie)
         requests(req)(client, numRequests - 1).map((_, id))
+    }
+  }
+
+  def getPath(path: String): String = {
+    weight match {
+      case Some(w) => path + "?weight=" + w
+      case None => path
     }
   }
 
