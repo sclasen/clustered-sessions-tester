@@ -60,8 +60,7 @@ object DB {
                     added timestamp
                     )
                     """)
-      println("Created table")
-      conn.getMetaData.getColumns()
+      println(" CREATE TABLE RESULTS")
     }
   }
 
