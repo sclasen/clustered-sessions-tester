@@ -19,23 +19,6 @@ object DB {
       pool.setUser(user)
       pool.setPassword(pass)
       pool.setDataSourceName("pg")
-      for (conn <- managed(pool.getConnection);
-           stmt <- managed(conn.createStatement())
-      ) {
-        stmt.execute("""
-                    CREATE TABLE RESULTS
-                    (
-                    stack varchar(1024),
-                    dynos bigint,
-                    requests bigint,
-                    counted bigint,
-                    concurrency bigint,
-                    scale bigint,
-                    added timestamp
-                    )
-                    """)
-        println("Created table")
-      }
       pool
   }
 
@@ -55,6 +38,27 @@ object DB {
               executeUpdate()
           }
         }
+    }
+  }
+
+  def main(args: Array[String]) {
+    for (conn <- managed(pool.getConnection);
+         stmt <- managed(conn.createStatement())
+    ) {
+      stmt.exexute("DROP TABLE RESULTS")
+      stmt.execute("""
+                    CREATE TABLE RESULTS
+                    (
+                    stack varchar(1024),
+                    dynos bigint,
+                    requests bigint,
+                    counted bigint,
+                    concurrency bigint,
+                    scale bigint,
+                    added timestamp
+                    )
+                    """)
+      println("Created table")
     }
   }
 
