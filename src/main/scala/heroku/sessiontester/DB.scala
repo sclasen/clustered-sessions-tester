@@ -46,7 +46,7 @@ object DB {
     for (conn <- managed(p.getConnection);
          stmt <- managed(conn.createStatement())
     ) {
-      stmt.exexute("DROP TABLE RESULTS")
+      stmt.execute("DROP TABLE RESULTS")
       stmt.execute("""
                     CREATE TABLE RESULTS
                     (
