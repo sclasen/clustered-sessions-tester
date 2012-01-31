@@ -22,19 +22,21 @@ object DB {
       pool
   }
 
-  def addTestRun(appStack: String, dynos: Int, requests: Int, counted: Int, concurrency: Int, scale: Int) {
+  def addTestRun(appUrl: String, appStack: String, dynos: Int, requests: Int, counted: Int, concurrency: Int, scale: Int, think: Int) {
     pool.foreach {
       p =>
         managed(p.getConnection).acquireAndGet {
-          c => managed(c.prepareStatement(""" INSERT INTO RESULTS VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
+          c => managed(c.prepareStatement(""" INSERT INTO RESULTS VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP) """)).acquireAndGet {
             s =>
               import s._
-              setString(1, appStack)
-              setInt(2, dynos)
-              setInt(3, requests)
-              setInt(4, counted)
-              setInt(5, concurrency)
-              setInt(6, scale)
+              setString(1, appUrl)
+              setString(2, appStack)
+              setInt(3, dynos)
+              setInt(4, requests)
+              setInt(5, counted)
+              setInt(6, concurrency)
+              setInt(7, scale)
+              setInt(8, think)
               executeUpdate()
           }
         }
@@ -51,12 +53,14 @@ object DB {
       stmt.execute("""
                     CREATE TABLE RESULTS
                     (
+                    app varchar(1024),
                     stack varchar(1024),
                     dynos bigint,
                     requests bigint,
                     counted bigint,
                     concurrency bigint,
                     scale bigint,
+                    think bigint,
                     added timestamp
                     )
                     """)
