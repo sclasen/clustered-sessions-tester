@@ -42,7 +42,8 @@ object DB {
   }
 
   def main(args: Array[String]) {
-    for (conn <- managed(pool.getConnection);
+    val p = pool.get
+    for (conn <- managed(p.getConnection);
          stmt <- managed(conn.createStatement())
     ) {
       stmt.exexute("DROP TABLE RESULTS")
