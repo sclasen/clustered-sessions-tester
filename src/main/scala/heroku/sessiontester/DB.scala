@@ -30,7 +30,7 @@ object DB {
                     requests bigint,
                     counted bigint,
                     concurrency bigint,
-                    scale bigint
+                    scale bigint,
                     added timestamp
                     )
                     """)
